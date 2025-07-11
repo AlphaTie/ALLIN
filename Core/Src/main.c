@@ -43,22 +43,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define AM 01
-#define NAM 10
-#define FM 11
-#define CW 12
-#define Default 00
 
-#define MHZ 1000000
-#define KHZ 1000
-
-
-uint32_t AM_ModRF_freq=0;
-uint32_t AM_Carr_freq=0;
-float AM_ModRF_Amp=0;
-float AM_Carr_Amp=0;
-uint32_t FM_ModRF_freq=0;
-uint32_t FM_Carr_freq=0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -95,8 +80,6 @@ void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
-/****************************/
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -111,9 +94,6 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint8_t resultflag=Default;
-	float PEAKVALUE=0;
-	float PEAKFREQ=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -155,7 +135,7 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim10,TIM_CHANNEL_1);
 	Init_AD9959();
 	HAL_DAC_Start(&hdac,DAC1_CHANNEL_1);
-	HAL_DAC_SetValue(&hdac,DAC1_CHANNEL_1,DAC_ALIGN_12B_R,1365);
+	HAL_DAC_SetValue(&hdac,DAC1_CHANNEL_1,DAC_ALIGN_12B_R,3000);
 	lcd_init();
 	lv_init();
 	lv_port_disp_init();	// Initialize display
@@ -176,8 +156,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		// Main detection process
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
 		
 

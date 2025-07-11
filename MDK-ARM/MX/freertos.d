@@ -242,4 +242,6 @@ mx/freertos.o: ..\Core\Src\freertos.c \
   ..\LVGL\porting\lv_port_disp.h ..\LVGL\porting\lv_port_indev.h \
   ..\LVGL\guiguide\gui_guider.h ..\LVGL\guiguide\events_init.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os.h \
-  ..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os2.h
+  ..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os2.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h

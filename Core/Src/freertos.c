@@ -23,7 +23,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
+#include "semphr.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -55,21 +55,25 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for adc1cpltsemaphore */
+osSemaphoreId_t adc1cpltsemaphoreHandle;
+const osSemaphoreAttr_t adc1cpltsemaphore_attributes = {
+  .name = "adc1cpltsemaphore"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 /*************************************************************************************************/
 
-#define TASK1_PRIO      2                   
-#define TASK1_STK_SIZE  1024                 
-TaskHandle_t  Task1_Handler;								
+#define TASK1_PRIO      2                   /* priority */
+#define TASK1_STK_SIZE  1024                 /* stack size */
+TaskHandle_t  Task1_Handler;								/* handler */
 void task1(void *pvParameters){
 		uint32_t Freq=0;
     while(1)
     {	
 				lv_task_handler();
-				printf("task 1");
-        vTaskDelay(1);                                               
+        vTaskDelay(10);        
     }
 
 
@@ -77,30 +81,37 @@ void task1(void *pvParameters){
 
 /*************************************************************************************************/
 extern uint8_t adc1cplt;
-extern uint16_t ADC_DMA_BUFFER[ADC_DMA_LENGTH];
+extern uint16_t ADC_DMA_BUFFER[ADC_DMA_LENGTH*2];
 extern ADC_HandleTypeDef hadc1;
-#define TASK2_PRIO      3                   /* �������ȼ� */
-#define TASK2_STK_SIZE  128                 /* �����ջ��С */
-TaskHandle_t  Task2_Handler;								/* ������ */
+#define TASK2_PRIO      3                   
+#define TASK2_STK_SIZE  128                 
+TaskHandle_t  Task2_Handler;								
 void task2(void *pvParameters){
 	
-		uint32_t i;
-		
+		uint16_t i;
     while(1) {  
-				printf("task 2");
-        vTaskDelay(100); 
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH * 2);
+        if (xSemaphoreTake(adc1cpltsemaphoreHandle, pdMS_TO_TICKS(5000)) == pdTRUE) {
+            HAL_ADC_Stop_DMA(&hadc1);
+        }
+        vTaskDelay(pdMS_TO_TICKS(10)); /* 1s */
     }
 }    
 
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc){
-		if (hadc->Instance == ADC1) {  
-      adc1cplt = 1;
-			printf("adc cplt");
-    }
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    
+					if (hadc->Instance == ADC1) {
+							printf("Semaphore give");
+							if (adc1cpltsemaphoreHandle != NULL) {
+									xSemaphoreGiveFromISR(adc1cpltsemaphoreHandle, &xHigherPriorityTaskWoken);
+							}
+							
+							portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+					}
+
 }
-
-
 /*************************************************************************************************/
 #define START_TASK_PRIO 1                   
 #define START_STK_SIZE  512            
@@ -123,11 +134,11 @@ void start_task(void *pvParameters){
                 (void*          )NULL,
                 (UBaseType_t    )TASK2_PRIO,
                 (TaskHandle_t*  )&Task2_Handler);														
-		vTaskDelete(StartTask_Handler); /* ɾ����ʼ���� */
-    taskEXIT_CRITICAL();            /* �˳��ٽ��� */
+		vTaskDelete(StartTask_Handler); 
+    taskEXIT_CRITICAL();            
 
 
-}; 
+}
 /*************************************************************************************************/
 /* USER CODE END FunctionPrototypes */
 
@@ -148,6 +159,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
+
+  /* Create the semaphores(s) */
+  /* creation of adc1cpltsemaphore */
+  adc1cpltsemaphoreHandle = osSemaphoreNew(1, 1, &adc1cpltsemaphore_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
