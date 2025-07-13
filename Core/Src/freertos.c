@@ -182,7 +182,7 @@ void start_task(void *pvParameters){
 
 //    printf("All tasks created successfully. Starting ADC1...\n");
 								
-		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH);
+//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH);
 		vTaskDelete(StartTask_Handler); 
           
 

@@ -12,6 +12,7 @@
 #include "lvgl.h"
 #include "AD9959.h"
 #include <stdlib.h>
+#include "cal.h"
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
@@ -21,6 +22,77 @@ extern lv_obj_t * kb;
 extern lv_obj_t * ta1;  // 声明外部变量
 extern lv_obj_t * ta2;  // 声明外部变量
 uint8_t Channel = 0; // AD9959 通道 
+
+
+// 单独的数据处理函数
+static void process_current_input(lv_obj_t * kb) {
+    lv_obj_t * ta = lv_keyboard_get_textarea(kb);
+    if(!ta) return;
+    
+    const char * txt = lv_textarea_get_text(ta);
+    
+    if(ta == ta1) {
+        // 频率处理
+        if(strlen(txt) > 0) {
+            float txtvalue = atof(txt);
+            uint32_t freq2wrt;
+            
+            if(strstr(txt, "MHZ")) {
+                freq2wrt = (uint32_t)(txtvalue * 1000000);
+            }
+            else if(strstr(txt, "KHZ")) {
+                freq2wrt = (uint32_t)(txtvalue * 1000);
+            }
+            else if(strstr(txt, "HZ")) {
+                freq2wrt = (uint32_t)txtvalue;
+            }
+            else {
+                freq2wrt = (uint32_t)txtvalue;
+            }
+            
+            if(freq2wrt < 1 || freq2wrt > 100000000) {
+                printf("Freq overflow\n");
+                return;
+            }
+            
+            printf("Set Freq: %u Hz\n", freq2wrt);
+            AD9959_Write_Frequence(Channel, freq2wrt);
+            
+            // 清空输入框
+            lv_textarea_set_text(ta, "");
+            // 隐藏键盘
+            
+        }
+    }
+    else if(ta == ta2) {
+        // 幅度处理
+        if(strlen(txt) > 0) {
+            float txtvalue = atof(txt);
+            uint16_t amp2wrt = 500;
+            
+            if(strstr(txt, "Vpp")) {
+                amp2wrt = Vpp2AmpCtrl(txtvalue);
+            }
+            else if(strstr(txt, "Vrms")) {
+                amp2wrt = Vrms2AmpCtrl(txtvalue);
+            }
+            else if(strstr(txt, "dBm")) {
+                amp2wrt = dbm2AmpCtrl(txtvalue);
+            }
+            else {
+                amp2wrt = (uint16_t)txtvalue;
+            }
+            
+            if(amp2wrt < 1 || amp2wrt > 1023) {
+                printf("Amp overflow\n");
+                return;
+            }
+            
+            printf("Set Amp: %d \n", amp2wrt);
+            AD9959_Write_Amplitude(Channel, amp2wrt);
+				}
+		}
+}
 
 static void screen_roller_1_event_handler (lv_event_t *e)
 {
@@ -40,76 +112,46 @@ static void screen_roller_1_event_handler (lv_event_t *e)
     }
 }
 
-
-static void kb_ready_event_cb(lv_event_t * e)
+static void kb_all_event_cb(lv_event_t * e)
 {
-    lv_obj_t * kb = lv_event_get_target(e);
-    lv_obj_t * ta = lv_keyboard_get_textarea(kb);
+    lv_event_code_t code = lv_event_get_code(e);
     
-    if(ta) {
-        const char * txt = lv_textarea_get_text(ta);
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t * kb = lv_event_get_target(e);
+        uint16_t btn_id = lv_btnmatrix_get_selected_btn(kb);
+        const char * btn_text = lv_btnmatrix_get_btn_text(kb, btn_id);
         
-        // 识别是哪个文本框并处理
-        if(ta == ta1) {
-            // 处理频率数据
-            if(strlen(txt) > 0) {
-                float txtvalue = atof(txt); // 将字符串转换为浮点数
-                uint32_t freq2wrt;
-                
-                // 检测单位并转换
-                if(strstr(txt, "MHZ") ) {
-                    // 输入包含MHz单位，转换为Hz
-                    freq2wrt = (uint32_t)(txtvalue * 1000000);
-                }
-                else if(strstr(txt, "KHZ")) {
-                    // 输入包含kHz单位，转换为Hz
-                    freq2wrt = (uint32_t)(txtvalue * 1000);
-                }
-                else if( strstr(txt, "HZ")) {
-                    // 输入包含Hz单位，直接使用
-                    freq2wrt = (uint32_t)txtvalue;
-                }
-                else {
-                    // 没有单位，默认为Hz
-                    freq2wrt = (uint32_t)txtvalue;
-                }
-                
-                // 范围检查
-                if(freq2wrt < 1 || freq2wrt > 100000000) {  // 1Hz - 100MHz
-                    printf("Overflow (1Hz - 100MHz)\n");
-                    return;
-                }
-                
-                printf("Set Freq: %d Hz\n", freq2wrt);
-                AD9959_Write_Frequence(Channel, freq2wrt);
-            }
+        printf("Key:%s\n", btn_text);  // 简化调试输出
+        
+        // 只处理特殊按键
+        if(strcmp(btn_text, LV_SYMBOL_CLOSE) == 0) {
+            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            printf("Keyboard hidden\n");
+            return;
         }
-        else if(ta == ta2) {
-            printf("Amp: %s\n", txt);
-            // 处理幅度数据
-            if(strlen(txt) > 0) {
-                uint16_t amp = atoi(txt);
-                
-                // 范围检查
-                if(amp > 1023) {  // 假设10位DAC
-                    printf("Overflow (0-1023)\n");
-                    return;
-                }
-                
-                printf("Set Amp: %d\n", amp);
-                AD9959_Write_Amplitude(Channel, amp);
-            }
+        
+        if(strcmp(btn_text, LV_SYMBOL_OK) == 0) {
+            // 确认键 - 执行数据处理
+            process_current_input(kb);
+            return;
         }
+        
+        // 其他按键不做复杂处理，让LVGL默认处理
     }
 }
+
 
 static void ta_event_cb_handler(lv_event_t * e)
 { 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * ta = lv_event_get_target(e);
     const char * txt = lv_textarea_get_text(ta);
-    
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code==LV_EVENT_CLICKED){
+        //clear the hidden flag of the keyboard,make it visible
+            lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+
+    }
+    else if(code == LV_EVENT_VALUE_CHANGED) {
         if(strcmp(txt, LV_SYMBOL_OK) == 0) {
             // 识别不同的文本框
             if(ta == ta1) {
@@ -138,6 +180,7 @@ static void ta_event_cb_handler(lv_event_t * e)
             }
         }
     }
+
 }
 
 static void screen_sw_1_event_handler (lv_event_t *e)
@@ -176,7 +219,7 @@ void events_init_screen (lv_ui *ui)
     lv_obj_add_event_cb(ui->screen_sw_1, screen_sw_1_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ta1, ta_event_cb_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ta2, ta_event_cb_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(kb, kb_ready_event_cb, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(kb, kb_all_event_cb, LV_EVENT_ALL, NULL);
 }
 
 

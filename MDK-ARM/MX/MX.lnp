@@ -11,6 +11,7 @@
 "mx\stm32f4xx_it.o"
 "mx\stm32f4xx_hal_msp.o"
 "mx\stm32f4xx_hal_timebase_tim.o"
+"mx\cal.o"
 "mx\lcd.o"
 "mx\ctiic.o"
 "mx\ft5206.o"

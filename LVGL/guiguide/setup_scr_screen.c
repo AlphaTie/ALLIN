@@ -193,7 +193,7 @@ void setup_scr_screen(lv_ui *ui)
     lv_obj_add_event_cb(ta1, ta_click_event_cb, LV_EVENT_FOCUSED, NULL);  
     lv_obj_set_size(ta1, 180, 60);
     lv_obj_set_pos(ta1, 0, 0);
-    lv_textarea_set_accepted_chars(ta1, "0123456789+-.MHZ");
+    lv_textarea_set_accepted_chars(ta1, "0123456789+-.MKHZ");
     lv_textarea_set_max_length(ta1, 10);
     lv_textarea_set_one_line(ta1, true);
     lv_textarea_set_placeholder_text(ta1, "AD9959 Freq");
@@ -205,7 +205,7 @@ void setup_scr_screen(lv_ui *ui)
     lv_obj_add_event_cb(ta2, ta_click_event_cb, LV_EVENT_FOCUSED, NULL);  
     lv_obj_set_size(ta2, 180, 60);
     lv_obj_set_pos(ta2, 0, 60);
-    lv_textarea_set_accepted_chars(ta2, "0123456789+-.Vpp");
+    lv_textarea_set_accepted_chars(ta2, "0123456789+-.VprmsdBm");
     lv_textarea_set_max_length(ta2, 10);
     lv_textarea_set_one_line(ta2, true);
     lv_textarea_set_placeholder_text(ta2, "AD9959 Amp");
@@ -216,7 +216,7 @@ void setup_scr_screen(lv_ui *ui)
     lv_obj_set_pos(kb, 100, 0);  
     lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
     lv_keyboard_set_textarea(kb, ta1);  
-
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     // ���ó�ʼ����
     lv_obj_set_style_bg_color(ta1, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_bg_color(ta2, lv_color_hex(0xFFFFFF), LV_PART_MAIN);

@@ -1,7 +1,60 @@
-mx/events_init.o: ..\LVGL\guiguide\events_init.c \
-  ..\LVGL\guiguide\events_init.h ..\LVGL\guiguide\gui_guider.h \
-  ..\LVGL\src\lvgl.h ..\LVGL\src\..\lvgl.h \
-  ..\LVGL\src\..\src\misc\lv_log.h \
+mx/cal.o: ..\Core\Src\cal.c ..\Core\Inc\cal.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h \
+  ..\Core\Inc\stm32f4xx_hal_conf.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h \
+  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
+  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h \
+  ..\Drivers\CMSIS\Include\core_cm4.h \
+  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_exti.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_cortex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_adc.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dac.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dac_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ramfunc.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_sram.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fsmc.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h \
+  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math_types.h \
+  ..\Drivers\CMSIS\Include\cmsis_compiler.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math_memory.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\none.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\utils.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\basic_math_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\interpolation_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\bayes_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\statistics_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\fast_math_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\matrix_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\complex_math_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\controller_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\support_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\distance_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\svm_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\svm_defines.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\transform_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\filtering_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\quaternion_math_functions.h \
+  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\window_functions.h \
+  ..\Core\Inc\main.h ..\HARDWARE\Inc\lcd.h ..\HARDWARE\Inc\touch.h \
+  ..\HARDWARE\Inc\delay.h ..\HARDWARE\Inc\AD9959.h ..\LVGL\src\lvgl.h \
+  ..\LVGL\src\..\lvgl.h ..\LVGL\src\..\src\misc\lv_log.h \
   ..\LVGL\src\..\src\misc\..\lv_conf_internal.h \
   ..\LVGL\src\..\src\misc\..\lv_conf_kconfig.h ..\LVGL\lv_conf.h \
   ..\LVGL\src\..\src\misc\lv_types.h ..\LVGL\src\..\src\misc\lv_timer.h \
@@ -199,60 +252,5 @@ mx/events_init.o: ..\LVGL\guiguide\events_init.c \
   ..\LVGL\src\..\src\extra\widgets\imgbtn\..\..\..\lvgl.h \
   ..\LVGL\src\..\src\extra\widgets\span\lv_span.h \
   ..\LVGL\src\..\src\extra\widgets\span\..\..\..\lvgl.h \
-  ..\HARDWARE\Inc\AD9959.h ..\Core\Inc\main.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h \
-  ..\Core\Inc\stm32f4xx_hal_conf.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h \
-  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
-  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h \
-  ..\Drivers\CMSIS\Include\core_cm4.h \
-  ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_exti.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_cortex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_adc.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dac.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dac_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ramfunc.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_sram.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fsmc.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h \
-  ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h \
-  ..\HARDWARE\Inc\lcd.h ..\HARDWARE\Inc\touch.h ..\HARDWARE\Inc\delay.h \
   ..\LVGL\porting\lv_port_disp.h ..\LVGL\porting\lv_port_indev.h \
-  ..\Core\Inc\cal.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math_types.h \
-  ..\Drivers\CMSIS\Include\cmsis_compiler.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\arm_math_memory.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\none.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\utils.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\basic_math_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\interpolation_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\bayes_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\statistics_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\fast_math_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\matrix_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\complex_math_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\controller_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\support_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\distance_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\svm_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\svm_defines.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\transform_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\filtering_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\quaternion_math_functions.h \
-  D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\window_functions.h
+  ..\LVGL\guiguide\gui_guider.h ..\LVGL\guiguide\events_init.h
