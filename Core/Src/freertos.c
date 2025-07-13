@@ -23,10 +23,11 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "semphr.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "semphr.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -65,7 +68,7 @@ const osSemaphoreAttr_t adc1cpltsemaphore_attributes = {
 /* USER CODE BEGIN FunctionPrototypes */
 /*************************************************************************************************/
 
-#define TASK1_PRIO      2                   /* priority */
+#define TASK1_PRIO      1                   /* priority */
 #define TASK1_STK_SIZE  1024                 /* stack size */
 TaskHandle_t  Task1_Handler;								/* handler */
 void task1(void *pvParameters){
@@ -80,21 +83,52 @@ void task1(void *pvParameters){
 };         
 
 /*************************************************************************************************/
-extern uint8_t adc1cplt;
-extern uint16_t ADC_DMA_BUFFER[ADC_DMA_LENGTH*2];
+/**
+ @note three ADC Handler share one public task function 
+*/
+extern uint16_t ADC_DMA_BUFFER[ADC_DMA_LENGTH];
+extern uint16_t ADC2_DMA_BUFFER[ADC_DMA_LENGTH];
+extern uint16_t ADC3_DMA_BUFFER[ADC_DMA_LENGTH];
 extern ADC_HandleTypeDef hadc1;
-#define TASK2_PRIO      3                   
-#define TASK2_STK_SIZE  128                 
-TaskHandle_t  Task2_Handler;								
-void task2(void *pvParameters){
+extern ADC_HandleTypeDef hadc2;
+extern ADC_HandleTypeDef hadc3;
+#define ADCTASK_PRIO      2                 /* Priority   */                   
+#define ADCTASK_STK_SIZE  1024                /* Stacksize */                 
+TaskHandle_t  ADCTask_Handler[3];							/* Handler    */
+void ADCprocess(void *pvParameters){
 	
-		uint16_t i;
+		
+		uint8_t adc_id= (uint32_t) pvParameters;  
     while(1) {  
-        HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH * 2);
-        if (xSemaphoreTake(adc1cpltsemaphoreHandle, pdMS_TO_TICKS(5000)) == pdTRUE) {
-            HAL_ADC_Stop_DMA(&hadc1);
-        }
-        vTaskDelay(pdMS_TO_TICKS(10)); /* 1s */
+        // HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH * 2);
+        // if (xSemaphoreTake(adc1cpltsemaphoreHandle, pdMS_TO_TICKS(5000)) == pdTRUE) {
+        //     HAL_ADC_Stop_DMA(&hadc1);
+				uint32_t ulNotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+				
+        // }
+				if(ulNotificationValue > 0) {
+					if(adc_id==1){
+						HAL_ADC_Stop_DMA(&hadc1);
+            printf("ADC1\n");
+						vTaskDelay(pdMS_TO_TICKS(1));
+						HAL_ADC_Start_DMA(&hadc2, (uint32_t *)ADC2_DMA_BUFFER, ADC_DMA_LENGTH);
+					}
+					else if(adc_id==2){
+						HAL_ADC_Stop_DMA(&hadc2);
+            printf("ADC2\n");
+						vTaskDelay(pdMS_TO_TICKS(1));
+						HAL_ADC_Start_DMA(&hadc3, (uint32_t *)ADC3_DMA_BUFFER, ADC_DMA_LENGTH);
+					}
+					else if(adc_id==3){
+						HAL_ADC_Stop_DMA(&hadc3);
+            printf("ADC3\n");
+						vTaskDelay(pdMS_TO_TICKS(1));
+						HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH);
+					}
+					
+				}	
+					vTaskDelay(pdMS_TO_TICKS(10)); /* 1s */
+					
     }
 }    
 
@@ -102,23 +136,28 @@ void task2(void *pvParameters){
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc){
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     
-					if (hadc->Instance == ADC1) {
-							printf("Semaphore give");
-							if (adc1cpltsemaphoreHandle != NULL) {
-									xSemaphoreGiveFromISR(adc1cpltsemaphoreHandle, &xHigherPriorityTaskWoken);
-							}
-							
-							portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+			if (hadc->Instance == ADC1) {
+					
+					vTaskNotifyGiveFromISR(ADCTask_Handler[0], &xHigherPriorityTaskWoken);
 					}
+			else if(hadc->Instance == ADC2){
+					
+					vTaskNotifyGiveFromISR(ADCTask_Handler[1], &xHigherPriorityTaskWoken);
+					}
+      else if(hadc->Instance == ADC3){
+           
+          vTaskNotifyGiveFromISR(ADCTask_Handler[2], &xHigherPriorityTaskWoken);
+          }
 
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 /*************************************************************************************************/
-#define START_TASK_PRIO 1                   
+#define START_TASK_PRIO 3                  
 #define START_STK_SIZE  512            
 TaskHandle_t  StartTask_Handler;  			
 
 void start_task(void *pvParameters){
-   taskENTER_CRITICAL();       
+        
  
 		printf("start task in");
     xTaskCreate((TaskFunction_t )task1,
@@ -128,14 +167,24 @@ void start_task(void *pvParameters){
                 (UBaseType_t    )TASK1_PRIO,
                 (TaskHandle_t*  )&Task1_Handler);
 								
-		xTaskCreate((TaskFunction_t )task2,
-                (const char*    )"task2",
-                (uint16_t       )TASK2_STK_SIZE,
-                (void*          )NULL,
-                (UBaseType_t    )TASK2_PRIO,
-                (TaskHandle_t*  )&Task2_Handler);														
+//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task", ADCTASK_STK_SIZE, (void* )1, ADCTASK_PRIO, &ADCTask_Handler[0]) != pdPASS) {
+//        printf("Failed to create ADC task 1\n");
+//        while(1);
+//    }
+//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task2", ADCTASK_STK_SIZE, (void* )2, ADCTASK_PRIO, &ADCTask_Handler[1]) != pdPASS) {
+//        printf("Failed to create ADC task 2\n");
+//        while(1);
+//    }
+//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task3", ADCTASK_STK_SIZE, (void* )3, ADCTASK_PRIO, &ADCTask_Handler[2]) != pdPASS) {
+//        printf("Failed to create ADC task 3\n");
+//        while(1);
+//    }
+
+//    printf("All tasks created successfully. Starting ADC1...\n");
+								
+		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH);
 		vTaskDelete(StartTask_Handler); 
-    taskEXIT_CRITICAL();            
+          
 
 
 }
@@ -183,11 +232,11 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	xTaskCreate((TaskFunction_t )start_task,
-                (const char*    )"start_task",
-                (uint16_t       )START_STK_SIZE,
-                (void*          )NULL,
-                (UBaseType_t    )START_TASK_PRIO,
-                (TaskHandle_t*  )&StartTask_Handler);
+              (const char*    )"start_task",
+              (uint16_t       )START_STK_SIZE,
+              (void*          )NULL,
+              (UBaseType_t    )START_TASK_PRIO,
+              (TaskHandle_t*  )&StartTask_Handler);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
