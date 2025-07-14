@@ -10,6 +10,8 @@ float dbm2vpp(float dbm);
 uint16_t Vpp2AmpCtrl(float vpp);
 uint16_t Vrms2AmpCtrl(float vrms);
 uint16_t dbm2AmpCtrl(float dbm);
+uint16_t Voffset2DacCtrl(float vpp);
+
 
 
 #endif

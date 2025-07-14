@@ -519,6 +519,7 @@ void tp_adjust(void)
  * @arg     0: 否
  * @arg     1: 是
  */
+//本电赛工程使用的是5510,24cxx用作保存仪器的校准数据,对多余的功能进行了裁剪
 uint8_t tp_init(void)
 {
     GPIO_InitTypeDef gpio_init_struct = {0};
@@ -557,65 +558,65 @@ uint8_t tp_init(void)
         tp_dev.touchtype |= 0X80;                                                       /* 电容屏 */
         return 0;
     }
-    else                                                                                /* 电阻屏 */
-    {
-        /* 使能时钟 */
-        T_PEN_GPIO_CLK_ENABLE();                                                        /* 使能T_PEN引脚端口时钟 */
-        T_CS_GPIO_CLK_ENABLE();                                                         /* 使能T_CS引脚端口时钟 */
-        T_MISO_GPIO_CLK_ENABLE();                                                       /* 使能T_MISO引脚端口时钟 */
-        T_MOSI_GPIO_CLK_ENABLE();                                                       /* 使能T_MOSI引脚端口时钟 */
-        T_CLK_GPIO_CLK_ENABLE();                                                        /* 使能T_CLK引脚端口时钟 */
+//    else                                                                                /* 电阻屏 */
+//    {
+//        /* 使能时钟 */
+//        T_PEN_GPIO_CLK_ENABLE();                                                        /* 使能T_PEN引脚端口时钟 */
+//        T_CS_GPIO_CLK_ENABLE();                                                         /* 使能T_CS引脚端口时钟 */
+//        T_MISO_GPIO_CLK_ENABLE();                                                       /* 使能T_MISO引脚端口时钟 */
+//        T_MOSI_GPIO_CLK_ENABLE();                                                       /* 使能T_MOSI引脚端口时钟 */
+//        T_CLK_GPIO_CLK_ENABLE();                                                        /* 使能T_CLK引脚端口时钟 */
+//        
+//        /* 配置T_PEN引脚 */
+//        gpio_init_struct.Pin = T_PEN_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_INPUT;
+//        gpio_init_struct.Pull = GPIO_PULLUP;
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+//        HAL_GPIO_Init(T_PEN_GPIO_PORT, &gpio_init_struct);
+//        
+//        /* 配置T_CS引脚 */
+//        gpio_init_struct.Pin = T_CS_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+//        gpio_init_struct.Pull = GPIO_PULLUP;
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+//        HAL_GPIO_Init(T_CS_GPIO_PORT, &gpio_init_struct);
+//        
+//        /* 配置T_MISO引脚 */
+//        gpio_init_struct.Pin = T_MISO_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_INPUT;
+//        gpio_init_struct.Pull = GPIO_PULLUP;
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+//        HAL_GPIO_Init(T_MISO_GPIO_PORT, &gpio_init_struct);
+//        
+//        /* 配置T_MOSI引脚 */
+//        gpio_init_struct.Pin = T_MOSI_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+//        gpio_init_struct.Pull = GPIO_PULLUP;
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+//        HAL_GPIO_Init(T_MOSI_GPIO_PORT, &gpio_init_struct);
+//        
+//        /* 配置T_CLK引脚 */
+//        gpio_init_struct.Pin = T_CLK_GPIO_PIN;
+//        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+//        gpio_init_struct.Pull = GPIO_PULLUP;
+//        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+//        HAL_GPIO_Init(T_CLK_GPIO_PORT, &gpio_init_struct);
+//        
+//        tp_read_xy(&tp_dev.x[0], &tp_dev.y[0]);                                         /* 第一次读取初始化 */
+        // at24cxx_init();                                                                 /* 初始化AT24CXX */
         
-        /* 配置T_PEN引脚 */
-        gpio_init_struct.Pin = T_PEN_GPIO_PIN;
-        gpio_init_struct.Mode = GPIO_MODE_INPUT;
-        gpio_init_struct.Pull = GPIO_PULLUP;
-        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(T_PEN_GPIO_PORT, &gpio_init_struct);
+        // if (tp_get_adjust_data())                                                       /* 已校准触摸 */
+        // {
+        //     return 0;
+        // }
+        // else                                                                            /* 未校准触摸 */
+        // {
+        //     tp_adjust();                                                                /* 触摸屏校准 */
+        //     tp_save_adjust_data();                                                      /* 保存校准参数 */
+        // }
         
-        /* 配置T_CS引脚 */
-        gpio_init_struct.Pin = T_CS_GPIO_PIN;
-        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
-        gpio_init_struct.Pull = GPIO_PULLUP;
-        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(T_CS_GPIO_PORT, &gpio_init_struct);
-        
-        /* 配置T_MISO引脚 */
-        gpio_init_struct.Pin = T_MISO_GPIO_PIN;
-        gpio_init_struct.Mode = GPIO_MODE_INPUT;
-        gpio_init_struct.Pull = GPIO_PULLUP;
-        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(T_MISO_GPIO_PORT, &gpio_init_struct);
-        
-        /* 配置T_MOSI引脚 */
-        gpio_init_struct.Pin = T_MOSI_GPIO_PIN;
-        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
-        gpio_init_struct.Pull = GPIO_PULLUP;
-        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(T_MOSI_GPIO_PORT, &gpio_init_struct);
-        
-        /* 配置T_CLK引脚 */
-        gpio_init_struct.Pin = T_CLK_GPIO_PIN;
-        gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
-        gpio_init_struct.Pull = GPIO_PULLUP;
-        gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(T_CLK_GPIO_PORT, &gpio_init_struct);
-        
-        tp_read_xy(&tp_dev.x[0], &tp_dev.y[0]);                                         /* 第一次读取初始化 */
-        at24cxx_init();                                                                 /* 初始化AT24CXX */
-        
-        if (tp_get_adjust_data())                                                       /* 已校准触摸 */
-        {
-            return 0;
-        }
-        else                                                                            /* 未校准触摸 */
-        {
-            tp_adjust();                                                                /* 触摸屏校准 */
-            tp_save_adjust_data();                                                      /* 保存校准参数 */
-        }
-        
-        tp_get_adjust_data();                                                           /* 获取触摸屏校准参数 */
-    }
+        // tp_get_adjust_data();                                                           /* 获取触摸屏校准参数 */
+//    }
     
     return 1;
 }

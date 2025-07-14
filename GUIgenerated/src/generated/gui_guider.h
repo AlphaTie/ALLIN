@@ -20,12 +20,13 @@ typedef struct
   
 	lv_obj_t *screen;
 	bool screen_del;
-	lv_obj_t *screen_cont_2;
+	lv_obj_t *screen_cont_cali;
+	lv_obj_t *screen_cont_input;
 	lv_obj_t *screen_roller_1;
-	lv_obj_t *screen_cont_1;
+	lv_obj_t *screen_sw_2;
+	lv_obj_t *screen_label_2;
 	lv_obj_t *screen_sw_1;
 	lv_obj_t *screen_label_1;
-	lv_obj_t *screen_spinner_1;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);

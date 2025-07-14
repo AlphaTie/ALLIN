@@ -10,17 +10,21 @@
 #include "events_init.h"
 #include <stdio.h>
 #include "lvgl.h"
-#include "AD9959.h"
-#include <stdlib.h>
-#include "cal.h"
+
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
 
 
+/************************************************************************************************************************************************/
+#include <stdlib.h>
+#include "AD9959.h"
+#include "cal.h"
+#include "dac.h"
 extern lv_obj_t * kb;
 extern lv_obj_t * ta1;  // 声明外部变量
 extern lv_obj_t * ta2;  // 声明外部变量
+extern lv_obj_t * ta3;  // 声明外部变量
 uint8_t Channel = 0; // AD9959 通道 
 
 
@@ -58,8 +62,6 @@ static void process_current_input(lv_obj_t * kb) {
             printf("Set Freq: %u Hz\n", freq2wrt);
             AD9959_Write_Frequence(Channel, freq2wrt);
             
-            // 清空输入框
-            lv_textarea_set_text(ta, "");
             // 隐藏键盘
             
         }
@@ -92,25 +94,29 @@ static void process_current_input(lv_obj_t * kb) {
             AD9959_Write_Amplitude(Channel, amp2wrt);
 				}
 		}
+    else if(ta == ta3) {
+        // DAC 输出处理
+        if(strlen(txt) > 0) {
+            float txt3value = atof(txt);
+            uint16_t  dac2wrt = 2048;
+            
+            if(strstr(txt, "mV")) {
+                dac2wrt = Voffset2DacCtrl(txt3value);
+            }
+           
+            else {
+                dac2wrt = (uint16_t)txt3value;
+            }
+            printf("Set DAC Output: %d \n", dac2wrt);
+						HAL_DAC_SetValue(&hdac,DAC1_CHANNEL_1,DAC_ALIGN_12B_R,dac2wrt);
+          
+        }
+    }
+    
+    // 清除文本框内容
+    lv_textarea_set_text(ta, "");
 }
 
-static void screen_roller_1_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_VALUE_CHANGED:
-    {
-        lv_obj_t * roller = lv_event_get_target(e);
-        //使用lv_roller_get_selected(roller);向Channel赋值
-        Channel = lv_roller_get_selected(roller);
-        printf("Selected Channel: %d\n", Channel);
-        
-        break;
-    }
-    default:
-        break;
-    }
-}
 
 static void kb_all_event_cb(lv_event_t * e)
 {
@@ -121,12 +127,11 @@ static void kb_all_event_cb(lv_event_t * e)
         uint16_t btn_id = lv_btnmatrix_get_selected_btn(kb);
         const char * btn_text = lv_btnmatrix_get_btn_text(kb, btn_id);
         
-        printf("Key:%s\n", btn_text);  // 简化调试输出
+        
         
         // 只处理特殊按键
         if(strcmp(btn_text, LV_SYMBOL_CLOSE) == 0) {
             lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            printf("Keyboard hidden\n");
             return;
         }
         
@@ -183,6 +188,56 @@ static void ta_event_cb_handler(lv_event_t * e)
 
 }
 
+
+static void screen_roller_1_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        lv_obj_t * roller = lv_event_get_target(e);
+        //使用lv_roller_get_selected(roller);向Channel赋值
+        Channel = lv_roller_get_selected(roller);
+        printf("Selected Channel: %d\n", Channel);
+        
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+
+static void screen_sw_2_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_CLICKED:
+    {
+        lv_obj_t * status_obj = lv_event_get_target(e);
+        int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
+
+        switch (status) {
+        case (true):
+        {
+            lv_obj_clear_flag(guider_ui.screen_cont_cali, LV_OBJ_FLAG_HIDDEN);
+            break;
+        }
+        case (false):
+        {
+            lv_obj_add_flag(guider_ui.screen_cont_cali, LV_OBJ_FLAG_HIDDEN);
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 static void screen_sw_1_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -195,12 +250,12 @@ static void screen_sw_1_event_handler (lv_event_t *e)
         switch (status) {
         case (true):
         {
-            lv_obj_add_flag(guider_ui.screen_cont_2, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(guider_ui.screen_cont_input, LV_OBJ_FLAG_HIDDEN);
             break;
         }
         case (false):
         {
-            lv_obj_clear_flag(guider_ui.screen_cont_2, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(guider_ui.screen_cont_input, LV_OBJ_FLAG_HIDDEN);
             break;
         }
         default:
@@ -216,9 +271,11 @@ static void screen_sw_1_event_handler (lv_event_t *e)
 void events_init_screen (lv_ui *ui)
 {
     lv_obj_add_event_cb(ui->screen_roller_1, screen_roller_1_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_sw_2, screen_sw_2_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_sw_1, screen_sw_1_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ta1, ta_event_cb_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ta2, ta_event_cb_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ta3, ta_event_cb_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(kb, kb_all_event_cb, LV_EVENT_ALL, NULL);
 }
 

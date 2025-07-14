@@ -71,4 +71,11 @@ mx/lv_refr.o: ..\LVGL\src\core\lv_refr.c ..\LVGL\src\core\lv_refr.h \
   ..\LVGL\src\core\..\font\lv_font.h \
   ..\LVGL\src\core\..\extra\others\snapshot\lv_snapshot.h \
   ..\LVGL\src\core\..\extra\others\snapshot\..\..\..\lv_conf_internal.h \
-  ..\LVGL\src\core\..\extra\others\snapshot\..\..\..\core\lv_obj.h
+  ..\LVGL\src\core\..\extra\others\snapshot\..\..\..\core\lv_obj.h \
+  ..\LVGL\src\core\..\widgets\lv_label.h \
+  ..\LVGL\src\core\..\widgets\..\lv_conf_internal.h \
+  ..\LVGL\src\core\..\widgets\..\core\lv_obj.h \
+  ..\LVGL\src\core\..\widgets\..\font\lv_font.h \
+  ..\LVGL\src\core\..\widgets\..\font\lv_symbol_def.h \
+  ..\LVGL\src\core\..\widgets\..\misc\lv_txt.h \
+  ..\LVGL\src\core\..\widgets\..\draw\lv_draw.h

@@ -23,7 +23,7 @@
 #include "lcdfont.h"
 #include "lcd_ex.c"
 #include "usart.h"
-
+#include <stdio.h>
 SRAM_HandleTypeDef g_sram_handle = {0};   /* SRAM句柄 */
 
 /* 绘制LCD时的背景色 */
@@ -1272,7 +1272,7 @@ void lcd_init(void)
      * 里面(卡死在f_putc函数), 所以, 必须初始化串口1, 或者屏蔽掉下面
      * 这行 printf 语句 !!!!!!!
      */
-  //  printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
+    printf("LCD ID:%x\r\n", lcddev.id); /* 打印LCD ID */
 
     if (lcddev.id == 0x7789)
     {

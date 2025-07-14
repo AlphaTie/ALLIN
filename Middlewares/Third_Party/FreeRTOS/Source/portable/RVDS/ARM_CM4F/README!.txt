@@ -1,0 +1,1 @@
+已经把仓库里RVDS文件夹移植相关的源代码和头文件改成了支持AC6的移植相关代码（D:\DevApp\STM32CubeMX\Repository\STM32Cube_FW_F4_V1.27.1\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM4F）

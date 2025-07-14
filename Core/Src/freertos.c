@@ -66,16 +66,20 @@ const osSemaphoreAttr_t adc1cpltsemaphore_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+
+extern IWDG_HandleTypeDef hiwdg;
+
 /*************************************************************************************************/
 
 #define TASK1_PRIO      1                   /* priority */
-#define TASK1_STK_SIZE  1024                 /* stack size */
+#define TASK1_STK_SIZE  2048                 /* stack size */
 TaskHandle_t  Task1_Handler;								/* handler */
 void task1(void *pvParameters){
 		uint32_t Freq=0;
     while(1)
     {	
 				lv_task_handler();
+				HAL_IWDG_Refresh(&hiwdg);
         vTaskDelay(10);        
     }
 
@@ -125,7 +129,7 @@ void ADCprocess(void *pvParameters){
 						vTaskDelay(pdMS_TO_TICKS(1));
 						HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH);
 					}
-					
+					HAL_IWDG_Refresh(&hiwdg);
 				}	
 					vTaskDelay(pdMS_TO_TICKS(10)); /* 1s */
 					
@@ -194,6 +198,21 @@ void start_task(void *pvParameters){
 void StartDefaultTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* Hook prototypes */
+void vApplicationTickHook(void);
+
+/* USER CODE BEGIN 3 */
+void vApplicationTickHook(void)
+{
+   /* This function will be called by each tick interrupt if
+   configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h. User code can be
+   added here, but the tick hook is called from an interrupt context, so
+   code must not attempt to block, and only the interrupt safe FreeRTOS API
+   functions can be used (those that end in FromISR()). */
+	lv_tick_inc(1);
+}
+/* USER CODE END 3 */
 
 /**
   * @brief  FreeRTOS initialization
