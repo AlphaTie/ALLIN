@@ -4165,6 +4165,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Hardwares/TLV56x8</GroupName>
+          <Files>
+            <File>
+              <FileName>TLV56XX_V1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\Src\TLV56XX_V1.c</FilePath>
+            </File>
+            <File>
+              <FileName>TLV56XX_V1.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\HARDWARE\Inc\TLV56XX_V1.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>

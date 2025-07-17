@@ -60,7 +60,7 @@ void custom_setup(lv_ui *ui)
     lv_textarea_set_placeholder_text(ta2, "AD9959 Amp");
 		
 		
-	ta3 = lv_textarea_create(ui->screen_cont_input);
+		ta3 = lv_textarea_create(ui->screen_cont_input);
     lv_obj_add_event_cb(ta3, ta_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ta3, ta_click_event_cb, LV_EVENT_CLICKED, NULL);  
     lv_obj_add_event_cb(ta3, ta_click_event_cb, LV_EVENT_FOCUSED, NULL);  

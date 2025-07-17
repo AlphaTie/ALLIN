@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "semphr.h"
+#include "cal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,7 +73,7 @@ extern IWDG_HandleTypeDef hiwdg;
 /*************************************************************************************************/
 
 #define TASK1_PRIO      1                   /* priority */
-#define TASK1_STK_SIZE  2048                 /* stack size */
+#define TASK1_STK_SIZE  1024                 /* stack size */
 TaskHandle_t  Task1_Handler;								/* handler */
 void task1(void *pvParameters){
 		uint32_t Freq=0;
@@ -93,11 +94,12 @@ void task1(void *pvParameters){
 extern uint16_t ADC_DMA_BUFFER[ADC_DMA_LENGTH];
 extern uint16_t ADC2_DMA_BUFFER[ADC_DMA_LENGTH];
 extern uint16_t ADC3_DMA_BUFFER[ADC_DMA_LENGTH];
+extern float FFT_OUTPUT[ADC_DMA_LENGTH];
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 #define ADCTASK_PRIO      2                 /* Priority   */                   
-#define ADCTASK_STK_SIZE  1024                /* Stacksize */                 
+#define ADCTASK_STK_SIZE  512                /* Stacksize */                 
 TaskHandle_t  ADCTask_Handler[3];							/* Handler    */
 void ADCprocess(void *pvParameters){
 	
@@ -113,8 +115,9 @@ void ADCprocess(void *pvParameters){
 				if(ulNotificationValue > 0) {
 					if(adc_id==1){
 						HAL_ADC_Stop_DMA(&hadc1);
+						fir_test(ADC_DMA_BUFFER);
             printf("ADC1\n");
-						vTaskDelay(pdMS_TO_TICKS(1));
+						vTaskDelay(pdMS_TO_TICKS(1000));
 						HAL_ADC_Start_DMA(&hadc2, (uint32_t *)ADC2_DMA_BUFFER, ADC_DMA_LENGTH);
 					}
 					else if(adc_id==2){
@@ -164,29 +167,36 @@ void start_task(void *pvParameters){
         
  
 		printf("start task in");
-    xTaskCreate((TaskFunction_t )task1,
-                (const char*    )"task1",
-                (uint16_t       )TASK1_STK_SIZE,
-                (void*          )NULL,
-                (UBaseType_t    )TASK1_PRIO,
-                (TaskHandle_t*  )&Task1_Handler);
+    if(xTaskCreate((TaskFunction_t )task1,
+									(const char*    )"task1",
+									(uint16_t       )TASK1_STK_SIZE,
+									(void*          )NULL,
+									(UBaseType_t    )TASK1_PRIO,
+									(TaskHandle_t*  )&Task1_Handler)!= pdPASS) {
+        printf("Failed to create LVGL task\n");
+        
+    }
 								
-//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task", ADCTASK_STK_SIZE, (void* )1, ADCTASK_PRIO, &ADCTask_Handler[0]) != pdPASS) {
-//        printf("Failed to create ADC task 1\n");
-//        while(1);
-//    }
-//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task2", ADCTASK_STK_SIZE, (void* )2, ADCTASK_PRIO, &ADCTask_Handler[1]) != pdPASS) {
-//        printf("Failed to create ADC task 2\n");
-//        while(1);
-//    }
-//    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task3", ADCTASK_STK_SIZE, (void* )3, ADCTASK_PRIO, &ADCTask_Handler[2]) != pdPASS) {
-//        printf("Failed to create ADC task 3\n");
-//        while(1);
-//    }
+    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task", ADCTASK_STK_SIZE, (void* )1, ADCTASK_PRIO, &ADCTask_Handler[0]) != pdPASS) {
+        printf("Failed to create ADC task 1\n");
+        
+    }
+    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task2", ADCTASK_STK_SIZE, (void* )2, ADCTASK_PRIO, &ADCTask_Handler[1]) != pdPASS) {
+        printf("Failed to create ADC task 2\n");
+        while(1);
+    }
+    if (xTaskCreate((TaskFunction_t )ADCprocess, "adc task3", ADCTASK_STK_SIZE, (void* )3, ADCTASK_PRIO, &ADCTask_Handler[2]) != pdPASS) {
+        printf("Failed to create ADC task 3\n");
+        while(1);
+    }
 
-//    printf("All tasks created successfully. Starting ADC1...\n");
-								
-//		HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH);
+    printf("All tasks created successfully. Starting ADC1...\n");
+			
+
+				
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFFER, ADC_DMA_LENGTH);
+		vTaskDelay(pdMS_TO_TICKS(100));
+		
 		vTaskDelete(StartTask_Handler); 
           
 
@@ -201,6 +211,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
 void vApplicationTickHook(void);
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 
 /* USER CODE BEGIN 3 */
 void vApplicationTickHook(void)
@@ -213,6 +224,16 @@ void vApplicationTickHook(void)
 	lv_tick_inc(1);
 }
 /* USER CODE END 3 */
+
+/* USER CODE BEGIN 4 */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
+	printf("OS Stack OverFlow");
+}
+/* USER CODE END 4 */
 
 /**
   * @brief  FreeRTOS initialization

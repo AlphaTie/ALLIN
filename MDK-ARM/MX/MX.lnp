@@ -263,6 +263,7 @@
 "mx\cmsis_os2.o"
 "mx\heap_4.o"
 "mx\port.o"
+"mx\tlv56xx_v1.o"
 "mx\basicmathfunctions.o"
 "mx\basicmathfunctionsf16.o"
 "mx\bayesfunctions.o"

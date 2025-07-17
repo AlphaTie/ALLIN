@@ -270,4 +270,5 @@ mx/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\filtering_functions.h \
   D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\quaternion_math_functions.h \
   D:\DevApp\KeilMDK\Pack\ARM\CMSIS-DSP\1.16.2\Include\dsp\window_functions.h \
-  ..\HARDWARE\Inc\gt9xxx.h
+  ..\HARDWARE\Inc\gt9xxx.h ..\Core\Inc\dev.h \
+  ..\HARDWARE\Inc\TLV56XX_V1.h

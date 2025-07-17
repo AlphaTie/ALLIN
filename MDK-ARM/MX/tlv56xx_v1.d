@@ -1,4 +1,5 @@
-mx/dev.o: ..\Core\Src\dev.c ..\Core\Inc\dev.h ..\Core\Inc\main.h \
+mx/tlv56xx_v1.o: ..\HARDWARE\Src\TLV56XX_V1.c \
+  ..\HARDWARE\Inc\TLV56XX_V1.h ..\Core\Inc\main.h \
   ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h \
   ..\Core\Inc\stm32f4xx_hal_conf.h \
   ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h \
@@ -233,5 +234,4 @@ mx/dev.o: ..\Core\Src\dev.c ..\Core\Inc\dev.h ..\Core\Inc\main.h \
   ..\LVGL\src\..\src\extra\widgets\span\lv_span.h \
   ..\LVGL\src\..\src\extra\widgets\span\..\..\..\lvgl.h \
   ..\LVGL\porting\lv_port_disp.h ..\LVGL\porting\lv_port_indev.h \
-  ..\LVGL\guiguide\gui_guider.h ..\LVGL\guiguide\events_init.h \
-  ..\HARDWARE\Inc\24cxx.h
+  ..\LVGL\guiguide\gui_guider.h ..\LVGL\guiguide\events_init.h

@@ -36,6 +36,8 @@
 #include "math.h"
 #include "touch.h"
 #include "gt9xxx.h"
+#include "dev.h"
+#include "TLV56XX_V1.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -132,16 +134,30 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start_IT(&htim4);
 	HAL_TIM_Base_Start(&htim2);
-	//HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH * 2);
+	//HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_DMA_BUFFER,ADC_DMA_LENGTH);
 	HAL_TIM_Base_Start(&htim8);
 	HAL_TIM_Base_Start(&htim3);
 	HAL_TIM_Base_Start(&htim10);
 	HAL_TIM_PWM_Start(&htim10,TIM_CHANNEL_1);
-	Init_AD9959();
+	
+	/**************** EEPROM  *****************/
+//	EEPROM_init();
+//	cal_write_adjust_data();
+//	cal_read_adjust_data();
+	
+	/**************** AD9959  *****************/
+//	Init_AD9959();
+//  AD9959_Set_Amplitude_Phase_Frequence(0,1024,0,1000000);
+//  AD9959_Set_Amplitude_Phase_Frequence(1,1024,90,1000000);
+	
+	/* DAC */
 	HAL_DAC_Start(&hdac,DAC1_CHANNEL_1);
 	HAL_DAC_SetValue(&hdac,DAC1_CHANNEL_1,DAC_ALIGN_12B_R,3000);
-  AD9959_Set_Amplitude_Phase_Frequence(0,1024,0,1000000);
-  AD9959_Set_Amplitude_Phase_Frequence(1,1024,90,1000000);
+	
+	// TLV_DAC_Init();
+	// TLV_DAC_Output(TLV_DAC_CH1,2);
+	
+	
 	lcd_init();
 	lv_init();
 	lv_port_disp_init();	// Initialize display
